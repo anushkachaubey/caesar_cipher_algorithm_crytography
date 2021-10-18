@@ -9,14 +9,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Locale;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button encrypt,decrypt;
+    private Button encrypt,decrypt,reset;
     private EditText message,cipher,key;
     private TextView screen_output;
     private static  final String alphabetString="abcdefghijklmnopqrstuvwxyz";
-    private static String finalTxt;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,10 +35,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    encrypt12(message.getText().toString(), Integer.parseInt(key.getText().toString()));
+                    encryptAlgo(message.getText().toString(), Integer.parseInt(key.getText().toString()));
                 }catch(Exception e){
                     e.printStackTrace();
-                    encrypt12(message.getText().toString(), 0);
+                    encryptAlgo(message.getText().toString(), 0);
                 }
             }
         });
@@ -45,61 +47,72 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    decrypt12(cipher.getText().toString(),Integer.parseInt(key.getText().toString()));
+                    decryptAlgo(cipher.getText().toString(),Integer.parseInt(key.getText().toString()));
                 }catch(Exception e){
                     e.printStackTrace();
-                    decrypt12(cipher.getText().toString(),0);
+                    decryptAlgo(cipher.getText().toString(),0);
                 }
             }
         });
-    }
-    public  void decrypt12(String cipher, int key)
-    {
-        screen_output.setText((decrypt1(cipher, key).toLowerCase()));
+
+//        reset.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                reset();
+//            }
+//        });
     }
 
-    public String decrypt1(String message, int shiftkey)
+    public String decryptAlgo(String msg, int shiftkey)
     {
-        reset();
-        for(int j=0;j<message.length();j++){
-            if(message.charAt(j)=='0' || message.charAt(j)== '1' || message.charAt(j)== '2' || message.charAt(j)== '3'|| message.charAt(j)== '4'|| message.charAt(j)== '5'|| message.charAt(j)== '6'|| message.charAt(j)== '7'|| message.charAt(j)== '8'|| message.charAt(j)== '9')
-            {
+        for(int j=0;j<msg.length();j++){
+
+            if(!( ((int)msg.charAt(j)>=65 && (int)msg.charAt(j)<=90) || ((int)msg.charAt(j)>=97 && (int)msg.charAt(j)<=122) || (int)msg.charAt(j)==32 ) ){
                 Toast.makeText(MainActivity.this, "Numbers not allowed", Toast.LENGTH_SHORT).show();
-                return "NumberError";
-            }
+                screen_output.setText("*Only letters allowed*");
+                return "";
+            }        //CHANGES
         }
+        msg=msg.toLowerCase();  //CHANGES
 
-        message=message.toLowerCase();
         String cipherText="";
-        for(int i=0;i<message.length();i++)
+        for(int i=0;i<msg.length();i++)
         {
-            if(message.charAt(i)!=' ') {
-                int charPosition = alphabetString.indexOf(message.charAt(i));
+            if(msg.charAt(i)!=' ') {
+                int charPosition = alphabetString.indexOf(msg.charAt(i));
                 int keyval = (-shiftkey + charPosition) % 26;
                 char replaceVAL = alphabetString.charAt(keyval);
                 cipherText += replaceVAL;
-                screen_output.setText(cipherText);
-                cipher.setText(cipherText);
+
             }
+            else
+                cipherText+=" ";
         }
+        screen_output.setText(cipherText.toUpperCase());
+        message.setText(cipherText);  //CHANGES
         return cipherText;
     }
 
-    private static void reset() {
-        finalTxt="";
-    }
 
-    public String encrypt12(String message, int shiftkey)
+    public void reset() {
+        screen_output.setText("");
+        cipher.setText("");
+        message.setText("");
+        key.setText("");
+    }  //CHANGES
+
+
+    public String encryptAlgo(String message, int shiftkey)
     {
         for(int j=0;j<message.length();j++){
-            if(message.charAt(j)=='0' || message.charAt(j)== '1' || message.charAt(j)== '2' || message.charAt(j)== '3'|| message.charAt(j)== '4'|| message.charAt(j)== '5'|| message.charAt(j)== '6'|| message.charAt(j)== '7'|| message.charAt(j)== '8'|| message.charAt(j)== '9')
-            {
+            if(!( ((int)message.charAt(j)>=65 && (int)message.charAt(j)<=90) || ((int)message.charAt(j)>=97 && (int)message.charAt(j)<=122) || (int)message.charAt(j)==32) ){
                 Toast.makeText(MainActivity.this, "Numbers not allowed", Toast.LENGTH_SHORT).show();
-                return "NumberError";
-            }
+                screen_output.setText("*Only letters allowed*");
+                return "";
+            }        //CHANGES
         }
 
-        message=message.toLowerCase();
+        message=message.toLowerCase();  //CHANGES
         String cipherText="";
         for(int i=0;i<message.length();i++)
         {
@@ -108,10 +121,12 @@ public class MainActivity extends AppCompatActivity {
                 int keyval = (shiftkey + charPosition) % 26;
                 char replaceVAL = alphabetString.charAt(keyval);
                 cipherText += replaceVAL;
-                screen_output.setText(cipherText);
-                cipher.setText(cipherText);
             }
+            else
+                cipherText+=" ";
         }
-        return cipherText;
+        screen_output.setText(cipherText.toUpperCase());
+        cipher.setText(cipherText);
+        return cipherText ;
     }
 }
